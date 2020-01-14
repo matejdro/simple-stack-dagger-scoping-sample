@@ -35,12 +35,15 @@ abstract class BackstackActivity : AppCompatActivity() {
     ): Backstack {
         val factory = BackstackHolderViewModelFactory(
             installer,
-            savedInstanceState,
             initialKeys
         )
 
         val viewModel = ViewModelProviders.of(this, factory).get<BackstackHolderViewModel>()
         backstack = viewModel.backstack
+
+        if (savedInstanceState != null) {
+            backstack.fromBundle(savedInstanceState.getParcelable("NAVIGATOR_STATE_BUNDLE"))
+        }
 
         return backstack
     }
@@ -70,7 +73,6 @@ abstract class BackstackActivity : AppCompatActivity() {
 
     private class BackstackHolderViewModelFactory(
         private val installer: Navigator.Installer,
-        private val savedInstanceState: Bundle?,
         private val initialKeys: List<*>
     ) :
         ViewModelProvider.Factory {
@@ -91,10 +93,6 @@ abstract class BackstackActivity : AppCompatActivity() {
             backstack.setup(initialKeys)
             for (completionListener in installer.stateChangeCompletionListeners) {
                 backstack.addStateChangeCompletionListener(completionListener)
-            }
-            if (savedInstanceState != null) {
-                backstack
-                    .fromBundle(savedInstanceState.getParcelable("NAVIGATOR_STATE_BUNDLE"))
             }
 
             @Suppress("UNCHECKED_CAST")
