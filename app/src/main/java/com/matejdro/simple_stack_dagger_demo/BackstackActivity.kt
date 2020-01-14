@@ -71,7 +71,10 @@ abstract class BackstackActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         backstack.executePendingStateChange()
-        backstack.finalizeScopes()
+
+        if (isFinishing) {
+            backstack.finalizeScopes()
+        }
     }
 
     private class BackstackHolderViewModel(val backstack: Backstack) : ViewModel()
