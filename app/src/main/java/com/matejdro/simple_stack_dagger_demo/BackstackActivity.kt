@@ -47,6 +47,12 @@ abstract class BackstackActivity : AppCompatActivity() {
         return backstack
     }
 
+    override fun onBackPressed() {
+        if (!backstack.goBack()) {
+            super.onBackPressed()
+        }
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putParcelable("BACKSTACK_STATE", backstack.toBundle())
