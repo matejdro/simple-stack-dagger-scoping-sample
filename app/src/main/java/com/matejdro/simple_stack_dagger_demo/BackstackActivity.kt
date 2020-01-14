@@ -1,5 +1,5 @@
 // HACK: This class resides in simple-stack package to allow access to navigator installer fields.
-package com.zhuinden.simplestack.navigator
+package com.matejdro.simple_stack_dagger_demo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -8,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.get
 import com.zhuinden.simplestack.Backstack
-
 /**
  * Base activity that uses ViewModel to manage the lifecycle of simple-stack's [Backstack].
  *
@@ -29,20 +28,20 @@ abstract class BackstackActivity : AppCompatActivity() {
      * Created backstack will not have state changer installed. You need to install it yourself.
      */
     protected fun initBackstack(
-        installer: Navigator.Installer,
         savedInstanceState: Bundle?,
-        initialKeys: List<*>
-    ): Backstack {
-        val factory = BackstackHolderViewModelFactory(
-            installer,
-            initialKeys
-        )
+        initialKeys: List<*>,
+        backstackConfiguration: Backstack.() -> Unit): Backstack {
+        val factory =
+            BackstackHolderViewModelFactory(
+                backstackConfiguration,
+                initialKeys
+            )
 
         val viewModel = ViewModelProviders.of(this, factory).get<BackstackHolderViewModel>()
         backstack = viewModel.backstack
 
         if (savedInstanceState != null) {
-            backstack.fromBundle(savedInstanceState.getParcelable("NAVIGATOR_STATE_BUNDLE"))
+            backstack.fromBundle(savedInstanceState.getParcelable("BACKSTACK_STATE"))
         }
 
         return backstack
@@ -50,7 +49,7 @@ abstract class BackstackActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable("NAVIGATOR_STATE_BUNDLE", backstack.toBundle())
+        outState.putParcelable("BACKSTACK_STATE", backstack.toBundle())
     }
 
     override fun onResume() {
@@ -72,31 +71,19 @@ abstract class BackstackActivity : AppCompatActivity() {
     private class BackstackHolderViewModel(val backstack: Backstack) : ViewModel()
 
     private class BackstackHolderViewModelFactory(
-        private val installer: Navigator.Installer,
+        private val backstackConfiguration: Backstack.() -> Unit,
         private val initialKeys: List<*>
     ) :
         ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             val backstack = Backstack()
-            backstack.setKeyFilter(installer.keyFilter)
-            backstack.setKeyParceler(installer.keyParceler)
-            backstack.setStateClearStrategy(installer.stateClearStrategy)
-            if (installer.scopedServices != null) {
-                backstack.setScopedServices(installer.scopedServices)
-            }
-            if (installer.globalServices != null) {
-                backstack.setGlobalServices(installer.globalServices)
-            }
-            if (installer.globalServiceFactory != null) {
-                backstack.setGlobalServices(installer.globalServiceFactory)
-            }
+            backstackConfiguration.invoke(backstack)
             backstack.setup(initialKeys)
-            for (completionListener in installer.stateChangeCompletionListeners) {
-                backstack.addStateChangeCompletionListener(completionListener)
-            }
 
             @Suppress("UNCHECKED_CAST")
-            return BackstackHolderViewModel(backstack) as T
+            return BackstackHolderViewModel(
+                backstack
+            ) as T
         }
     }
 }
