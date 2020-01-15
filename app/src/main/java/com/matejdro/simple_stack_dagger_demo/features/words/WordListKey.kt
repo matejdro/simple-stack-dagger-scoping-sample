@@ -15,4 +15,6 @@ object WordListKey : FragmentKey(), ScopeKey.Child {
     override fun getParentScopes(): List<String> =
         listOf(WordController::class.java.name)
 
+    override val fragmentTag: String
+        get() = javaClass.name // object toString() includes hashCode()
 }
