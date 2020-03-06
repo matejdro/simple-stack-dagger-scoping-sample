@@ -33,20 +33,6 @@ abstract class WordsModule {
     @ClassKey(WordController::class)
     abstract fun bindWordController(wordController: WordController): Any
 
-    // Aliases
-
-    @Binds
-    @ScopedService
-    abstract fun bindNewWordActionHandler(@ScopedService wordController: WordController): NewWordFragment.ActionHandler
-
-    @Binds
-    @ScopedService
-    abstract fun bindWordListActionHandler(@ScopedService wordController: WordController): WordListFragment.ActionHandler
-
-    @Binds
-    @ScopedService
-    abstract fun bindDataProvider(@ScopedService wordController: WordController): WordListFragment.DataProvider
-
     @Module
     companion object {
         // More Aliases

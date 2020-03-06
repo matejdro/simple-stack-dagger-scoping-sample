@@ -15,10 +15,7 @@ class WordEventEmitter(
 
 class WordController @Inject constructor(
     private val backstack: Backstack
-) : NewWordFragment.ActionHandler,
-    WordListFragment.ActionHandler,
-    WordListFragment.DataProvider,
-    Bundleable {
+) : Bundleable {
     sealed class Events {
         data class NewWordAdded(val word: String) : Events()
     }
@@ -27,7 +24,7 @@ class WordController @Inject constructor(
     val eventEmitter = WordEventEmitter(wordEventEmitter)
 
     private val mutableWords: MutableLiveData<List<String>> = MutableLiveData()
-    override val wordList: LiveData<List<String>>
+    val wordList: LiveData<List<String>>
         get() = mutableWords
 
     init {
@@ -41,11 +38,11 @@ class WordController @Inject constructor(
         wordEventEmitter.emit(Events.NewWordAdded(word))
     }
 
-    override fun onAddNewWordClicked(wordListFragment: WordListFragment) {
+    fun onAddNewWordClicked(wordListFragment: WordListFragment) {
         backstack.goTo(NewWordKey)
     }
 
-    override fun onAddWordClicked(newWordFragment: NewWordFragment, word: String) {
+    fun onAddWordClicked(newWordFragment: NewWordFragment, word: String) {
         if (word.isNotEmpty()) {
             addWordToList(word)
         }

@@ -18,18 +18,9 @@ import kotlinx.android.synthetic.main.word_list_view.*
 import javax.inject.Inject
 
 class WordListFragment @Inject constructor(
-    @ScopedService private val actionHandler: ActionHandler,
-    @ScopedService private val dataProvider: DataProvider,
+    @ScopedService private val wordController: WordController,
     @ScopedService private val eventEmitter: WordEventEmitter
 ) : Fragment() {
-    interface ActionHandler {
-        fun onAddNewWordClicked(wordListFragment: WordListFragment)
-    }
-
-    interface DataProvider {
-        val wordList: LiveData<List<String>>
-    }
-
     val adapter = WordListAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -43,10 +34,10 @@ class WordListFragment @Inject constructor(
         recyclerView.adapter = adapter
 
         buttonGoToAddNewWord.onClick { view ->
-            actionHandler.onAddNewWordClicked(this)
+            wordController.onAddNewWordClicked(this)
         }
 
-        dataProvider.wordList.observe(this /*getViewLifecycleOwner()*/, Observer { words ->
+        wordController.wordList.observe(this /*getViewLifecycleOwner()*/, Observer { words ->
             adapter.updateWords(words!!)
         })
 

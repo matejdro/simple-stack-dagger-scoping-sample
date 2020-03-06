@@ -11,12 +11,8 @@ import kotlinx.android.synthetic.main.new_word_fragment.*
 import javax.inject.Inject
 
 class NewWordFragment @Inject constructor(
-    @ScopedService private val actionHandler: ActionHandler
+    @ScopedService private val wordController: WordController
 ) : Fragment() {
-    interface ActionHandler {
-        fun onAddWordClicked(newWordFragment: NewWordFragment, word: String)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         inflater.inflate(R.layout.new_word_fragment, container, false)
 
@@ -25,7 +21,7 @@ class NewWordFragment @Inject constructor(
 
         buttonAddNewWord.setOnClickListener {
             val word = textInputNewWord.text.toString().trim()
-            actionHandler.onAddWordClicked(this, word)
+            wordController.onAddWordClicked(this, word)
         }
     }
 }
